@@ -3,7 +3,7 @@ import openai
 import os
 from llama_index import StorageContext, load_index_from_storage
 from pathlib import Path
-import ipdb
+#import ipdb
 import time
 
 
