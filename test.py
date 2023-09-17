@@ -3,7 +3,7 @@ import openai
 import os
 from llama_index import StorageContext, load_index_from_storage
 from pathlib import Path
-import ipdb
+#import ipdb
 import time
 
 
@@ -74,7 +74,10 @@ def clear_chat_history():
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 
-
+sources=[]
+url_to_sources=[]
+filepath=[]
+output_list=[]
 # If last message is not from assistant, generate a new response
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
@@ -85,15 +88,14 @@ if st.session_state.messages[-1]["role"] != "assistant":
             #full_response = ''
             st.write(response.response)
             
-            sources=[]
-            url_to_sources=[]
-            filepath=[]
+            
             # Display all sources
             for i, source_node in enumerate(response.source_nodes, start=1):
                 source_text = source_node.to_dict()['node']['text']
                 source_metadata = source_node.to_dict()['node']['metadata']
                 source_filepath = source_metadata['file_path']
                 source_filename=source_metadata['file_name']
+                formatted_source=""
                 if source_filename.endswith('.py'):
                     formatted_source  = f"#### Source #{i}\n```python\n{source_text}```"
                     st.markdown(formatted_source)
@@ -101,12 +103,16 @@ if st.session_state.messages[-1]["role"] != "assistant":
                     st.write(source_text)
                 sources.append(formatted_source)
                 st.markdown(f"Path within repo: **{source_filepath}**")
-                
+                filepath.append(source_filepath)
                 url_to_concatenate_to_sources = f'https://github.com/jerryjliu/llama_index/tree/main/{source_filepath}'
                 url_to_sources.append(url_to_concatenate_to_sources)
                 st.markdown(f"Link to source: {url_to_concatenate_to_sources}")
-            ipdb.set_trace()
-            message = {"role": "assistant", "content": response.response}
+            output_list=sources + filepath + url_to_sources
+            final_output=""
+            for item in output_list:
+                final_output=final_output.join(item)
+            #ipdb.set_trace()
+            message = {"role": "assistant", "content": response.response + '\n' + final_output}
             
             #for item in message:
             #    full_response += item
