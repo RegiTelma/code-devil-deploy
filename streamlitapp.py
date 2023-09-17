@@ -3,7 +3,7 @@ import openai
 import os
 from llama_index import StorageContext, load_index_from_storage
 from pathlib import Path
-#import ipdb
+import ipdb
 import time
 
 
@@ -20,7 +20,7 @@ openai.api_key = st.secrets.OPENAI_API_KEY
 
 #use this to check that the api key is correct
 #st.write(openai.api_key)
-path = Path(os.getcwd())  / 'data'
+path = Path('./data')
 
 
 if "messages" not in st.session_state.keys(): # Initialize the chat messages history
@@ -31,7 +31,10 @@ if "messages" not in st.session_state.keys(): # Initialize the chat messages his
 @st.cache_resource(show_spinner=False)
 def load_data():
     with st.spinner(text="Loading and indexing the LlamaIndex docs – hang tight! This should take 1-2 minutes."):
+        print(os.getcwd())
+        #ipdb.set_trace()
         storage_context = StorageContext.from_defaults(persist_dir=str(path))
+        
         index = load_index_from_storage(storage_context=storage_context)
         return index
         #TODO: figure out difference between ServiceContext and StorageContext and how to create the ServiceContext
